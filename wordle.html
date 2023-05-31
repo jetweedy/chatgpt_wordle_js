@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wordle Game</title>
+  <style>
+    /* Styles for the game */
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+
+    .guess {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .guess span {
+      display: inline-block;
+      padding: 5px;
+      margin: 5px;
+      border-radius: 5px;
+    }
+
+    input {
+      margin-top: 10px;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="game-container">
+    <h1>Wordle Game</h1>
+    <div id="feedback-display"></div>
+    <div id="attempts-display"></div>
+    <div id="previous-guesses"></div>
+    <input type="text" id="guess-input" placeholder="Enter your guess">
+    <button id="guess-button">Guess</button>
+  </div>
+</body>
+
+<script>
+
+// List of possible five-letter words
+const wordList = ["apple", "grape", "melon", "peach", "plumb"];
+
+// Select a random word from the word list
+let secretWord = wordList[Math.floor(Math.random() * wordList.length)];
+console.log("Correct word:", secretWord);
+
+// Maximum number of attempts allowed
+const maxAttempts = 6;
+
+// Get DOM elements
+const feedbackElement = document.getElementById('feedback-display');
+const attemptsDisplay = document.getElementById('attempts-display');
+const guessInput = document.getElementById('guess-input');
+const guessButton = document.getElementById('guess-button');
+const previousGuessesElement = document.getElementById('previous-guesses');
+
+// Initialize attempts counter
+let attempts = 0;
+
+// Array to store previous guesses
+const previousGuesses = [];
+
+// Function to check the guess and provide feedback
+function checkGuess(guess) {
+  // Check if the guess is correct
+  if (guess === secretWord) {
+    return "Congratulations! You guessed the word.";
+  }
+
+  // Check the position of correct letters
+  let feedback = '';
+  for (let i = 0; i < secretWord.length; i++) {
+    if (guess[i] === secretWord[i]) {
+      feedback += 'G';
+    } else if (secretWord.indexOf(guess[i]) !== -1) {
+      feedback += 'Y';
+    }
+  }
+
+  return feedback || 'No correct letters.';
+}
+
+// Function to update the feedback and attempts display
+function updateDisplay(feedback, attempts) {
+  feedbackElement.textContent = feedback;
+  attemptsDisplay.textContent = "Attempts: " + attempts + "/" + maxAttempts;
+}
+
+// Function to handle the guess button click event
+function handleGuess() {
+  const guess = guessInput.value;
+  const feedback = checkGuess(guess);
+  attempts++; // Increment the attempts counter
+  updateDisplay(feedback, attempts);
+
+  // Create a new element to display the guess
+  const guessElement = document.createElement('div');
+  guessElement.classList.add('guess');
+
+  // Add letter spans with appropriate background colors
+  for (let i = 0; i < guess.length; i++) {
+    const letterSpan = document.createElement('span');
+    letterSpan.textContent = guess[i];
+    letterSpan.style.backgroundColor = getLetterBackgroundColor(guess, i);
+    guessElement.appendChild(letterSpan);
+  }
+
+  // Append the guess element to the previous guesses element
+  previousGuessesElement.appendChild(guessElement);
+
+  // Clear the guess input
+  guessInput.value = '';
+
+  // Check if the game is won or lost
+  if (feedback.startsWith('Congratulations')) {
+    guessInput.disabled = true;
+    guessButton.disabled = true;
+  } else if (attempts === maxAttempts) {
+    feedbackElement.textContent = `You lost! The word was "${secretWord}".`;
+    guessInput.disabled = true;
+    guessButton.disabled = true;
+  }
+}
+
+
+// Function to get the background color for each letter
+function getLetterBackgroundColor(guess, index) {
+  const guessLetter = guess.charAt(index);
+  const secretLetter = secretWord.charAt(index);
+
+  console.log(guess, secretWord);
+  console.log(guessLetter, secretLetter);
+
+  if (guessLetter === secretLetter) {
+    return "green";
+  } else if (secretWord.includes(guessLetter)) {
+    return "yellow";
+  } else {
+    return "";
+  }
+}
+// Attach event listener to the guess button
+guessButton.addEventListener('click', handleGuess);
+
+
+</script>
+
+</html>
