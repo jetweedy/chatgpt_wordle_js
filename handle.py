@@ -19,10 +19,14 @@ for line in lines:
   if line in ignore:
     continue
   if line in participants:
+    if (coding):
+      output += "</pre>"
+      coding = False
     output += ("<h3>"+line+"</h3>")
   elif line in languages:
     if (coding):
       output += "</pre>"
+      coding = False
     output += ("<h4>"+line+"</h4>")
     output += ("<pre class='code'>")
     print("------ [ CODE --------------")
